@@ -20,13 +20,20 @@ class EventManager
     @manager.broadcast(id, data)
   end
 
+  def self.async(&block)
+    @manager.async(&block)
+  end
+
   def self.has_listener?(id)
     @manager.has_listener? id
   end
 
   def self.transfer_fiber
-
     (Thread.current[:fiber_context] || @manager).transfer_fiber
+  end
+
+  def self.add_poller(poller)
+    @manager.add_poller(poller)
   end
 
   def initialize

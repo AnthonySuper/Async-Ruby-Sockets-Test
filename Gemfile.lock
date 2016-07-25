@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    nio4r (1.2.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  nio4r
+
+BUNDLED WITH
+   1.12.5
