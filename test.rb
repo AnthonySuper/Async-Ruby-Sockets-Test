@@ -1,18 +1,16 @@
-require_relative './event_manager.rb'
-require_relative './delay_value.rb'
-require_relative './async_http.rb'
 require 'uri'
 require 'json'
 
+require_relative './lib/kitchen_sync.rb'
 
 def get_board(name)
   u = URI("https://a.4cdn.org/#{name}/catalog.json")
-  return JSON.parse(AsyncHTTP.get(u).await)
+  return JSON.parse(KitchenSync::Util::HTTP.get(u).await)
 end
 
 def get_board_names
   board_uri = URI("https://a.4cdn.org/boards.json")
-  resp = JSON.parse(AsyncHTTP.get(board_uri).await)
+  resp = JSON.parse(KitchenSync::Util::HTTP.get(board_uri).await)
   resp["boards"].map{|h| h["board"]}
 end
 
@@ -29,7 +27,7 @@ def threadinfo(json)
 end
 
 
-EventManager.run do
+KitchenSync::EventManager.run do
   async do
     board_names = get_board_names
     board_names.each do |name|
@@ -53,12 +51,13 @@ EventManager.run do
   end
 
   async do
-    puts DelayValue.give_after_delay("Another", 2).await
-    puts DelayValue.give_after_delay("Something else", 4).await
+    puts KitchenSync::Util::DelayValue.give_after_delay("Another", 2).await
+    d2 = KitchenSync::Util::DelayValue.give_after_delay("Something else", 4)
+    puts d2.await
   end
 
   async do
-    puts DelayValue.give_after_delay("Delayed value", 2).await
+    p = KitchenSync::Util::DelayValue.give_after_delay("Delayed value", 2)
+    puts p.await
   end
-  
 end
