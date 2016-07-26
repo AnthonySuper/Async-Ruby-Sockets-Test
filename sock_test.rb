@@ -1,15 +1,13 @@
-require_relative './event_manager.rb'
-require_relative './async_socket.rb'
 require 'socket'
-
+require './lib/kitchen_sync'
 serv = Socket.new(:INET, :STREAM, 0)
 serv.listen(5)
 c = Socket.new(:INET, :STREAM, 0)
 c.connect(serv.connect_address)
 
-EventManager.run do
+KitchenSync::EventManager.run do
   async do
-    AsyncSocket.use(c) do |sock|
+    KitchenSync::Socket.use(c) do |sock|
       read = sock.read(1000).await
       puts "I read '#{read}'"
     end
@@ -17,7 +15,7 @@ EventManager.run do
 
   async do
     s, info = serv.accept
-    AsyncSocket.use(s) do |sock|
+    KitchenSync::Socket.use(s) do |sock|
       res = sock.write(%q{
                        This is a test of socket writing.
                        I don't know how it works.
