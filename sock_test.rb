@@ -9,7 +9,7 @@ KitchenSync::EventManager.run do
   async do
     KitchenSync::Socket.use(c) do |sock|
       read = sock.read(1000).await
-      puts "I read '#{read}'"
+      puts "I read '#{read}' from socket"
     end
   end
 

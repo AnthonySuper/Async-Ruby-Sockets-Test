@@ -58,6 +58,10 @@ module KitchenSync
       @manager.add_poller(poller)
     end
 
+    def self.remove_poller(poller)
+      @manager.remove_poller(poller)
+    end
+
     def initialize
       @listeners = {}
       @pollers = []
@@ -72,17 +76,15 @@ module KitchenSync
       # This gets complicated, so we try to explain this as much as we can.
 
       # First, define an overall fiber that holds our sub-fibers
-      mainfiber = Fiber.new do
+      @mainfiber = Fiber.new do
         # the loopfiber runs the event loop
         # We can't transfer control to this fiber until the setup
         # block is finished running.
         loopfiber = Fiber.new do
           loop do
-            # First, poll for events
-            @pollers.each{|p| p.call}
-
-            if @listeners.empty?
-              mainfiber.transfer
+            poll_all_pollers
+            while @listeners.empty?
+              handle_empty_listeners
             end
             handle_event(@queue.pop)
           end
@@ -107,7 +109,7 @@ module KitchenSync
 
       # initially we want to run our setup block, so we set our 
       # @fiber to the overall main fiber
-      @fiber = mainfiber
+      @fiber = @mainfiber
       # We then run it 
       @fiber.resume 
     end
@@ -147,9 +149,23 @@ module KitchenSync
       @pollers << poller
     end
 
+    def remove_poller(poller)
+      @pollers.delete(poller)
+    end
+
     def transfer_fiber
       @fiber
     end
 
+    def poll_all_pollers
+      @pollers.each{|p| p.call}
+    end
+
+    def handle_empty_listeners
+      if @pollers.empty?
+        @mainfiber.transfer
+      end
+      poll_all_pollers
+    end
   end
 end

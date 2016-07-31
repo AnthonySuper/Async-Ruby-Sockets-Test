@@ -1,6 +1,7 @@
 require 'nio'
 require_relative './promise'
 require 'socket'
+require 'pry'
 
 module KitchenSync
   class Socket
@@ -9,11 +10,15 @@ module KitchenSync
         @selector
       else
         @selector = ::NIO::Selector.new
-        EventManager.add_poller(lambda do
+        l = lambda do
+          if @selector.empty?
+            EventManager.remove_poller(l)
+          end
           @selector.select(0.5) do |ready|
             ready.value.call
           end
-        end)
+        end
+        EventManager.add_poller(l)
         @selector
       end
     end
@@ -23,7 +28,7 @@ module KitchenSync
       monitor = self.selector.register(socket, mode)
       s = self.new(monitor)
       block.call(s)
-      @selector.deregister(s)
+      monitor.close
     end
 
     def initialize(monitor)
