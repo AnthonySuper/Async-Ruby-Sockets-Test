@@ -12,6 +12,26 @@ module Ballet
   # When the promise is rejected, the same thing happens, but an exception is
   # thrown instead.
   class Promise
+
+    class Multi
+      def initialize(promises)
+        @promises = promises
+      end
+
+      def await
+        @promises.map(&:await)
+      end
+    end
+
+    ##
+    # Create a new promise that allows you to await on many promises at once.
+    #
+    # promises
+    # :   The array of promises to wait for
+    def self.all(promises)
+      Multi.new(promises)
+    end
+
     def initialize
     end
 
@@ -19,7 +39,7 @@ module Ballet
     # Await the fullfilment of this promise, passing control to other fibers
     # until the value you want is available.
     def await
-      EventManager.current.listen(self, Fiber.current)
+      EventManager.listen(self, Fiber.current) unless @value
       status, val = get_value
       if status == :bad
         raise val
@@ -53,14 +73,10 @@ module Ballet
       end
     end
 
-    private
+    protected
 
     def get_value
-      if @value
-        value
-      else
-        EventManager.transfer_fiber.transfer
-      end
+      @value || EventManager.transfer_fiber.transfer
     end
   end
 end

@@ -35,11 +35,11 @@ module Ballet
       @monitor.value = lambda{}
     end
 
-    def read(size)
+    def read(*args)
       p = Promise.new
       @monitor.value = lambda do
         if @monitor.readable?
-          p.resolve!(@monitor.io.read_nonblock(size))
+          p.resolve!(@monitor.io.read_nonblock(*args))
         end
       end
       p

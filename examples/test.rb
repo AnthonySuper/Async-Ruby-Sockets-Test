@@ -6,7 +6,7 @@ Bundler.require
 
 def get_board(name)
   u = URI("https://a.4cdn.org/#{name}/catalog.json")
-  return JSON.parse(Ballet::Util::HTTP.get(u).await)
+  return Ballet::Util::HTTP.get(u)
 end
 
 def get_board_names
@@ -31,24 +31,16 @@ end
 Ballet::EventManager.run do
   async do
     board_names = get_board_names
-    board_names.each do |name|
-      async do
-        info = get_board(name)
-        threads = info.map{|i| i["threads"]}.flatten
-        times = threads.map{|t| Time.at(t["time"].to_i)}
-        oldest, newest = threads.minmax do |a, b|
-          a["time"].to_i <=> b["time"].to_i
-        end
-        puts "---"
-        puts "The oldest thread on /#{name}/ is no. #{oldest["no"]}"
-        threadinfo(oldest)
-        puts "The newest is no. #{newest["no"]}"
-        threadinfo(newest)
-        puts "---"
-        puts
-        puts
-      end
+    promises = board_names.map{|n| get_board(n)}
+    responses = Ballet::Promise.all(promises).await.map{|r| JSON.parse(r)}
+    threads = responses.flatten.map{|r| r["threads"]}.flatten
+    oldest, newest = threads.minmax do |a, b|
+      a["time"].to_i <=> b["time"].to_i
     end
+    puts "Oldest thread created on #{oldest["time"]}"
+    threadinfo(oldest)
+    puts "Newest thread created on #{newest["time"]}"
+    threadinfo(newest)
   end
 
   async do
