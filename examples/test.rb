@@ -1,16 +1,17 @@
 require 'uri'
 require 'json'
+require 'bundler'
 
-require_relative './lib/kitchen_sync.rb'
+Bundler.require
 
 def get_board(name)
   u = URI("https://a.4cdn.org/#{name}/catalog.json")
-  return JSON.parse(KitchenSync::Util::HTTP.get(u).await)
+  return JSON.parse(Ballet::Util::HTTP.get(u).await)
 end
 
 def get_board_names
   board_uri = URI("https://a.4cdn.org/boards.json")
-  resp = JSON.parse(KitchenSync::Util::HTTP.get(board_uri).await)
+  resp = JSON.parse(Ballet::Util::HTTP.get(board_uri).await)
   resp["boards"].map{|h| h["board"]}
 end
 
@@ -27,7 +28,7 @@ def threadinfo(json)
 end
 
 
-KitchenSync::EventManager.run do
+Ballet::EventManager.run do
   async do
     board_names = get_board_names
     board_names.each do |name|
@@ -51,13 +52,13 @@ KitchenSync::EventManager.run do
   end
 
   async do
-    puts KitchenSync::Util::DelayValue.give_after_delay("Another", 2).await
-    d2 = KitchenSync::Util::DelayValue.give_after_delay("Something else", 4)
+    puts Ballet::Util::DelayValue.give_after_delay("Another", 2).await
+    d2 = Ballet::Util::DelayValue.give_after_delay("Something else", 4)
     puts d2.await
   end
 
   async do
-    p = KitchenSync::Util::DelayValue.give_after_delay("Delayed value", 2)
+    p = Ballet::Util::DelayValue.give_after_delay("Delayed value", 2)
     puts p.await
   end
 end

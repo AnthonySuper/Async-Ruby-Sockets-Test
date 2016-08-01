@@ -1,9 +1,9 @@
 require 'thread'
 
-module KitchenSync::Util
+module Ballet::Util
   class CheapAsync
     def self.perform(&block)
-      p = KitchenSync::Promise.new
+      p = Ballet::Promise.new
       Thread.new do
         sleep 0
         begin

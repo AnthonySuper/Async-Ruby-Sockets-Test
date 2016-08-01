@@ -1,13 +1,16 @@
 require 'socket'
-require './lib/kitchen_sync'
+require 'bundler'
+
+Bundler.require
+
 serv = Socket.new(:INET, :STREAM, 0)
 serv.listen(5)
 c = Socket.new(:INET, :STREAM, 0)
 c.connect(serv.connect_address)
 
-KitchenSync::EventManager.run do
+Ballet::EventManager.run do
   async do
-    KitchenSync::Socket.use(c) do |sock|
+    Ballet::Socket.use(c) do |sock|
       read = sock.read(1000).await
       puts "I read '#{read}' from socket"
     end
@@ -15,7 +18,7 @@ KitchenSync::EventManager.run do
 
   async do
     s, info = serv.accept
-    KitchenSync::Socket.use(s) do |sock|
+    Ballet::Socket.use(s) do |sock|
       res = sock.write(%q{
                        This is a test of socket writing.
                        I don't know how it works.

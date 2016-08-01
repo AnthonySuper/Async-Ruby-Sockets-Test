@@ -1,7 +1,7 @@
-module KitchenSync
+module Ballet
 
   ##
-  # A promise in KitchenSync is a pattern to easily wrap an async action, but
+  # A promise in Ballet is a pattern to easily wrap an async action, but
   # it works differently than promises in other frameworks.
   # As opposed to having methods to register callbacks to wait for values,
   # a `Promise` in KitchenSink lets you simply wait for a value to be delivered.

@@ -1,6 +1,6 @@
 require 'net/http'
 
-module KitchenSync::Util
+module Ballet::Util
   class HTTP
     def self.get(*args)
       CheapAsync.perform do

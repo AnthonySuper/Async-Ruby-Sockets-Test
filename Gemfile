@@ -1,5 +1,4 @@
-# frozen_string_literal: true
-# A sample Gemfile
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem 'nio4r'
+# Specify your gem's dependencies in ballet.gemspec
+gemspec

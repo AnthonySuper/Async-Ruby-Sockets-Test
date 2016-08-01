@@ -1,9 +1,8 @@
 require 'nio'
 require_relative './promise'
 require 'socket'
-require 'pry'
 
-module KitchenSync
+module Ballet
   class Socket
     def self.selector
       if @selector

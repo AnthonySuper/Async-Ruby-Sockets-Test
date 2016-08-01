@@ -1,4 +1,4 @@
-module KitchenSync
+module Ballet
 
   class AsyncRunner
     def initialize(context, &block)

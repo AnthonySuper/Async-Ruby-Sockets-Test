@@ -4,7 +4,7 @@ require_relative './async_runner.rb'
 
 Thread.abort_on_exception = true
 
-module KitchenSync
+module Ballet
   ##
   # The EventManager class handles the event loop.
   # This may be slightly obvious. Oh well.
