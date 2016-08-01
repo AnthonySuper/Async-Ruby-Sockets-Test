@@ -1,5 +1,4 @@
 module Ballet
-
   ##
   # A promise in Ballet is a pattern to easily wrap an async action, but
   # it works differently than promises in other frameworks.
